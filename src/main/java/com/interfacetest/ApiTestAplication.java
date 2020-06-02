@@ -20,7 +20,7 @@ public class ApiTestAplication implements CommandLineRunner {
      */
     @SuppressWarnings("unused")
     private void init() throws InterruptedException {
-        SwaggerToJson.run();
+        //SwaggerToJson.run();
         Thread.sleep(10000);
         System.out.println("GetSwaggerJsonSuccessfully");
     }

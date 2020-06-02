@@ -16,6 +16,6 @@ public class apiDataBean {
     private int status; //返回状态
     private String verify;//判定内容
     private String save; //需要保存的内容
-    private String param; //接口发送需要的参数
+    private String param[]; //接口发送需要的参数
     private int sleep; //暂停时间
 }
