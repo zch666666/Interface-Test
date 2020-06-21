@@ -1,5 +1,6 @@
 package com.interfacetest.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -9,9 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ParamParser {
     private static ObjectMapper objectMapper=new ObjectMapper();
@@ -118,29 +118,10 @@ public class ParamParser {
         return resultNode;
     }
 
-    public static void main(String[] args) {
-//        System.out.println( interfaceParamParser(FileUtil.getInterfaceJson("-demo-addUserInfo"))
-//);
-        System.out.println(paramMapParser().toString());
 
-
-
-    }
-
-//    public static JsonNode paramParse(String objectName)  {
-//        Map<String,JsonNode> paramJsonMap;
-//        JsonNode resultNode;
-////        Map<String,JsonNode> mamm=FileUtil.getFilesToMap(System.getProperty("user.dir") +"\\target\\jsonfiles\\models");
-//        Map<String,JsonNode> modelsSwaggerMap=FileUtil.getFilesToMap(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath.models"));
-//        paramJsonMap=paramMapParser(modelsSwaggerMap);
-//        System.out.println(modelsSwaggerMap);
-//        System.out.println(paramJsonMap);
-//        resultNode=paramJsonMap.get(objectName);
-//        return resultNode;
-//    }
 
     //read swagger object map and output param json map.
-    private static  Map<String,JsonNode> paramMapParser(){
+    private static  Map<String,JsonNode> paramMapParser() {
         Map<String,JsonNode> modelsSwaggerMap=FileUtil.getFilesToMap(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath.models"));
         //Store classes without object-type member variables
         Map<String,JsonNode> swaggerModelsWithOutObj=new HashMap<>();
@@ -151,9 +132,6 @@ public class ParamParser {
         //Split param map into two map,One has object-type member variables and the other does not.
         for (Map.Entry<String, JsonNode> entry : modelsSwaggerMap.entrySet()) {
             JsonNode jsonNode=entry.getValue();
-//            JsonNode properties=jsonNode.get("properties");
-//            JsonNode objRef=properties.findValue("$ref");
-            //if (objRef!=null){
             String jsonStr=jsonNode.toString();
             if (jsonStr.contains("$ref")){
                 swaggerModelsWithObj.put(entry.getKey(),entry.getValue());
@@ -163,8 +141,10 @@ public class ParamParser {
             }
         }
 
-        //Map<String,JsonNode>  modelsJsonWithOutObj=mapWithOutObjParser(swaggerModelsWithOutObj);
-        //resultMap.putAll(modelsJsonWithOutObj);
+        Map<String,JsonNode>  modelsJsonWithOutObj=mapWithOutObjParser(swaggerModelsWithOutObj);
+        resultMap.putAll(modelsJsonWithOutObj);
+
+        //Obj With Obj JsonMap need further develop
 
         //Map<String,JsonNode> ObjWithObjJsonMap=mapWithOutObjParser(mapWithObj);
         //resultMap.putAll(ObjWithObjJsonMap);
@@ -192,13 +172,99 @@ public class ParamParser {
      * @param swaggerModelsWithOutObj
      * @return Map<String,JsonNode>
      */
-    private static Map<String,JsonNode> mapWithOutObjParser(Map<String,JsonNode> swaggerModelsWithOutObj){
-        Map<String,JsonNode> resultMap;
+
+    public static void main(String[] args) throws JsonProcessingException {
+//        System.out.println( interfaceParamParser(FileUtil.getInterfaceJson("-demo-addUserInfo"))
+//);
+        System.out.println(paramMapParser().toString());
+    }
+
+
+    private static Map<String,JsonNode> mapWithOutObjParser(Map<String,JsonNode> swaggerModelsWithOutObj)  {
+        Map<String,JsonNode> resultMap=new HashMap<>();
+
         for (Map.Entry<String, JsonNode> entry : swaggerModelsWithOutObj.entrySet()) {
+            Map<String,JsonNode> tempMap=new HashMap<>();
+            String nodeName=entry.getKey();
+            JsonNode modelSWJsonNode=entry.getValue();
+            JsonNode properties=modelSWJsonNode.get("properties");
+            JsonNode resultNode;
+
+            JSONObject propertiesJson=new JSONObject(properties.toString());
+            JSONObject resultJson=new JSONObject();
+
+            //System.out.println("tempJSONis:  "+tempJson);
+
+            for (Iterator<String> it = propertiesJson.keys(); it.hasNext(); ) {
+                String key = it.next();
+                JSONObject property= propertiesJson.getJSONObject(key);
+                //System.out.println("key is "+key+"   "+"value is : "+temp);
+                String typeValue= property.getString("type");
+                switch (typeValue){
+                    case "array":
+                        //System.out.println("woshi array");
+                        JSONObject arrayInfo=property.getJSONObject("items");
+                        String elementType=arrayInfo.getString("type");
+
+                        if(elementType.equals("string")){
+                            List<String> array=new ArrayList<>();
+                            array.add(RandomUtil.getRandomStr());
+                            resultJson.put(key,array);
+                        }else if (elementType.equals("integer")){
+                            List<Integer> array=new ArrayList<>();
+                            array.add(RandomUtil.getRandomInt());
+                            resultJson.put(key,array);
+                        }
+                        //System.out.println("resultJson is:"+resultJson);
+                    break;
+
+                    case "string":
+                        //special string case,like date or uuid etc...
+                        if (property.has("format")){
+                            String format= property.getString("format");
+                            if (format.equals("date-time")){
+                                SimpleDateFormat sdf1 =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                                resultJson.put(key,sdf1.format(new Date()));
+                            }else if (format.equals("uuid")){
+                                resultJson.put(key,RandomUtil.getRandomUUID());
+                            }
+                        }
+                        //just normal string
+                        else
+                            resultJson.put(key,RandomUtil.getRandomStr());
+
+                        break;
+                    case "integer":
+                        resultJson.put(key,RandomUtil.getRandomInt());
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + typeValue);
+                }
+
+
+            }
+
+            try {
+                resultNode=objectMapper.readTree(resultJson.toString());
+                System.out.println("resultNode is:"+resultNode);
+                tempMap.put(nodeName,resultNode);
+                resultMap.putAll(tempMap);
+            }catch (JsonProcessingException e){
+                logger.info("error occur in mapWithOutObj Parser");
+            }
+        }
+        return resultMap;
+    }
+
+    /* //need further develop
+    private static Map<String,JsonNode> mapWithObjParser(Map<String,JsonNode> swaggerModelsWithObj){
+        Map<String,JsonNode> resultMap;
+        for (Map.Entry<String, JsonNode> entry : swaggerModelsWithObj.entrySet()) {
 
         }
         return null;
     }
+     */
 
     private static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
 
