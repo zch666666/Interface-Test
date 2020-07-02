@@ -16,7 +16,6 @@ import static com.interfacetest.util.FileUtil.writeJsonToFile;
 *
  */
 public class GetSwagger {
-    private static final Logger logger = LoggerFactory.getLogger(GetSwagger.class);
     //host format : http://localhost/8080
     //private static String HOST=System.getProperty("host")+"/v2/api-docs";
     private static String HOST= PropertiesUtil.getProperty("host")+"/v2/api-docs";

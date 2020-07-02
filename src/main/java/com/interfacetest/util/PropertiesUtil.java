@@ -20,9 +20,7 @@ public class PropertiesUtil {
         InputStream in = null;
         try {
             in = PropertiesUtil.class.getResourceAsStream(DEFAULT_PROPERTIES);
-//            System.out.println(PropertiesUtil.class.getResource("").getPath());
-//            System.out.println(PropertiesUtil.class.getResource("/").getPath());
-//            System.out.println(PropertiesUtil.class.getClassLoader().getResource("").getPath());
+
             props.load(in);
         } catch (FileNotFoundException e) {
             logger.error("properties文件未找到");
@@ -54,4 +52,6 @@ public class PropertiesUtil {
         }
         return props.getProperty(key, defaultValue);
     }
+
+
 }

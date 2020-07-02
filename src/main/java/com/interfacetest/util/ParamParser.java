@@ -16,7 +16,11 @@ import java.util.*;
 public class ParamParser {
     private static ObjectMapper objectMapper=new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(ParamParser.class);
-    private static Map<String,JsonNode> paramJsonMap=new HashMap<>();
+    private static Map<String,JsonNode> paramJsonMap;
+
+    static {
+        paramJsonMap=paramMapParser();
+    }
 
     /*
     "parameters": [
@@ -58,27 +62,20 @@ public class ParamParser {
 
         JsonNode resultNode=objectMapper.createObjectNode();
         //Extract parameters array
-        ArrayNode params = (ArrayNode) interfaces.get("parameters");
+        ArrayNode params = (ArrayNode) interfaces.findValue("parameters");
 
         for(JsonNode objectNode:params){
             //param is object
             if(objectNode.get("schema")!=null){
                 //读取$ref并根据他的值找出需要的类的json，并根据相应的类的json文件生成类的各项参数。
                 JsonNode schemaNode=objectNode.get("schema");
+                JsonNode tempNode;
                 //example:{"$ref":"#/definitions/User"}
-                String objectPath=schemaNode.get("$ref").toString();
+                String objectPath=schemaNode.get("$ref").toString().replace("\"","");
                 String objectName=objectPath.split("/")[2];
-//                System.out.println(schemaNode.toString());
-//                System.out.println(objectName);
-//                System.out.println("schema YES!");
                 //convert swagger interface schema in to json for API test
-                //schemaNode= paramParse(objectName);
-                if(paramJsonMap.isEmpty())
-                    paramJsonMap=paramMapParser();
-                else
-                    schemaNode=paramJsonMap.get(objectName);
-
-                resultNode=merge(resultNode,schemaNode);
+                tempNode=paramJsonMap.get(objectName);
+                resultNode=merge(resultNode,tempNode);
             }
 
             //param is not object
@@ -100,16 +97,16 @@ public class ParamParser {
                     if (objectNode.path("format").asText().equals("uuid")|objectNode.path("format").asText().equals("UUID")){
                         JSONObject uuidJson=new JSONObject();
                         uuidJson.put(objectNode.get("name").textValue(),RandomUtil.getRandomUUID());
-                        System.out.println("uuidjson="+uuidJson.toString());
                         JsonNode uuidNode=objectMapper.readTree(uuidJson.toString());
 
                         resultNode=merge(resultNode,uuidNode);
+                    }else{
+                        //no key "format" just normal string
+                        JSONObject strJson=new JSONObject();
+                        strJson.put(objectNode.get("name").textValue(),RandomUtil.getRandomStr());
+                        JsonNode uuidNode=objectMapper.readTree(strJson.toString());
+                        resultNode=merge(resultNode,uuidNode);
                     }
-                    //no key "format" just normal string
-                    JSONObject strJson=new JSONObject();
-                    strJson.put(objectNode.get("name").textValue(),RandomUtil.getRandomStr());
-                    JsonNode uuidNode=objectMapper.readTree(strJson.toString());
-                    resultNode=merge(resultNode,uuidNode);
                 }
 
             }
@@ -149,8 +146,8 @@ public class ParamParser {
         //Map<String,JsonNode> ObjWithObjJsonMap=mapWithOutObjParser(mapWithObj);
         //resultMap.putAll(ObjWithObjJsonMap);
 
-        System.out.println("mapWithoutObj: "+swaggerModelsWithOutObj.toString());
-        System.out.println("mapWithObj: "+swaggerModelsWithObj.toString());
+//        System.out.println("mapWithoutObj: "+swaggerModelsWithOutObj.toString());
+//        System.out.println("mapWithObj: "+swaggerModelsWithObj.toString());
 
         return resultMap;
     }
@@ -169,16 +166,13 @@ public class ParamParser {
      *     }
      *   }
      * }
-     * @param swaggerModelsWithOutObj
-     * @return Map<String,JsonNode>
      */
 
-    public static void main(String[] args) throws JsonProcessingException {
+    public static void main(String[] args) {
 //        System.out.println( interfaceParamParser(FileUtil.getInterfaceJson("-demo-addUserInfo"))
 //);
-        System.out.println(paramMapParser().toString());
+        //System.out.println(paramMapParser().toString());
     }
-
 
     private static Map<String,JsonNode> mapWithOutObjParser(Map<String,JsonNode> swaggerModelsWithOutObj)  {
         Map<String,JsonNode> resultMap=new HashMap<>();
@@ -246,7 +240,7 @@ public class ParamParser {
 
             try {
                 resultNode=objectMapper.readTree(resultJson.toString());
-                System.out.println("resultNode is:"+resultNode);
+                //System.out.println("resultNode is:"+resultNode);
                 tempMap.put(nodeName,resultNode);
                 resultMap.putAll(tempMap);
             }catch (JsonProcessingException e){
@@ -256,7 +250,9 @@ public class ParamParser {
         return resultMap;
     }
 
-    /* //need further develop
+
+    //need further develop
+    /*
     private static Map<String,JsonNode> mapWithObjParser(Map<String,JsonNode> swaggerModelsWithObj){
         Map<String,JsonNode> resultMap;
         for (Map.Entry<String, JsonNode> entry : swaggerModelsWithObj.entrySet()) {
@@ -286,7 +282,6 @@ public class ParamParser {
             }
 
         }
-
         return mainNode;
     }
 }
