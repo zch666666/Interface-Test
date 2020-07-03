@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="接口自动化测试" verbose="1" preserve-order="true" parallel="false">
+    <test name="自动化测试用例">
+        <classes>
+            <class name="com.interfacetest.verification.apiVerification">
+                <methods>
+                    <include name="apiTest"></include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <listeners>
+        <listener class-name="com.interfacetest.listener.ExtentTestNGIReporterListener">
+        </listener>
+    </listeners>
+</suite>

@@ -3,10 +3,11 @@ package com.interfacetest.dataprovider;
 import com.interfacetest.util.HttpUtil;
 
 import com.interfacetest.util.PropertiesUtil;
+import org.apache.http.HttpEntity;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import static com.interfacetest.util.FileUtil.writeJsonToFile;
@@ -32,8 +33,16 @@ public class GetSwagger {
 
     public static String getSwaggerFromUrl(String host) {
         JSONObject param=new JSONObject();
-        String result;
-        result= HttpUtil.sendGet(host,param);
+        String result=null;
+        HttpEntity entity=HttpUtil.sendGet(host,param).getEntity();
+        if (entity!=null){
+            try {
+                result= EntityUtils.toString(entity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (result != null){
             writeJsonToFile(result,"swaggerAll");
             return result;
@@ -74,12 +83,4 @@ public class GetSwagger {
         }
         return params;
     }
-
-        public static void main(String[] args) {
-        swaggerAllJsonStr=getSwaggerFromUrl(HOST);
-        interfaceInfoJson = interfaceParser(swaggerAllJsonStr);
-            System.out.println(interfaceInfoJson);
-        paramsInfoJson = paramsInfoParser(swaggerAllJsonStr);
-            System.out.println(paramsInfoJson);
-        }
 }

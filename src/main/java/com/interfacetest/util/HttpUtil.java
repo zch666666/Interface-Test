@@ -22,7 +22,7 @@ import java.util.Iterator;
 public class HttpUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
-    public static String sendGet(String url, JSONObject json){
+    public static HttpResponse sendGet(String url, JSONObject json){
         HttpGet httpGet;
         if (json.isEmpty()){
             logger.info("This test without any param");
@@ -36,57 +36,40 @@ public class HttpUtil {
             Iterator<?> it=json.keys();
             while(it.hasNext()){
                 key=it.next().toString();
-                value=json.getString(key);
+                value=  json.get(key).toString();
                 sb.append(key).append("=").append(value).append("&");
             }
             String params=sb.deleteCharAt(sb.length()-1).toString();
             logger.info("request data is "+"\t\n"+params);
             httpGet=new HttpGet(url+"?"+params);
         }
-        CloseableHttpResponse response=null;
+        HttpResponse response=null;
         try{
             response=getHttpclient().execute(httpGet);
         }catch (IOException e1){
             e1.printStackTrace();
         }
-        String result=null;
-        try{
-            HttpEntity entity=response.getEntity();
-            if (entity!=null){
-                result= EntityUtils.toString(entity);
-            }
-        }catch (ParseException|IOException e){
-            e.printStackTrace();
-        }finally {
-            try {
-                response.close();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-        return result;
+        return response;
     }
 
-    public static String sendPost(String url,String jsonRequest){
-        String body=null;
+    public static HttpResponse sendPost(String url,String jsonRequest){
         int statusCode;
         HttpPost post=new HttpPost(url);
         post.addHeader("Content-Type","application/json; charset=utf-8");
         post.addHeader("Accept","application/json");
         post.setEntity(new StringEntity(jsonRequest, Charset.forName("UTF-8")));
 
-        HttpResponse response;
+        HttpResponse response=null;
         try{
             response=getHttpclient().execute(post);
             statusCode=response.getStatusLine().getStatusCode();
             if (statusCode!= 200){
                 logger.error("Method failed:"+response.getStatusLine());
             }
-            body=EntityUtils.toString(response.getEntity(),"UTF-8");
         }catch (IOException e){
             logger.error("exception: "+e);
         }
-        return body;
+        return response;
     }
 
     private static CloseableHttpClient getHttpclient() {

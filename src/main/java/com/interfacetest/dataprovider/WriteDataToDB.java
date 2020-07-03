@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.util.*;
 
+//读取本地Json文件,转换成测试用例存入数据库。
 public class WriteDataToDB {
     private static final Logger logger = LoggerFactory.getLogger(GetSwagger.class);
     private static Set<ApiData> apiDataBeans;
@@ -22,11 +23,6 @@ public class WriteDataToDB {
         apiDataBeans =new HashSet<>();
         setApiCases();
     }
-
-    public static void main(String[] args) {
-        run();
-    }
-
     /**
      * 将接口测试用例信息写入数据库，
      */
@@ -34,9 +30,9 @@ public class WriteDataToDB {
         SqlSession sqlSession= DBUtil.getSession();
         for (ApiData apiCase: apiDataBeans) {
             sqlSession.insert("ins",apiCase);
-            sqlSession.commit();
         }
-        sqlSession.close();
+        sqlSession.commit();
+        DBUtil.close();
     }
 
     /**
@@ -46,12 +42,14 @@ public class WriteDataToDB {
      */
     public static void setApiCases()  {
         JsonNode params;
-        //读取所有interfaces中.json文件转成JsonNode
+        //读取所有interfaces中.json文件转成JsonNode，再转换成ApiData以Bean的形式存入数据库
         //key 为请求uri, value是请求其他参数信息。
         Map<String, JsonNode> interfacesSwaggerMap= FileUtil.getFilesToMap(System.getProperty("user.dir") + PropertiesUtil.getProperty("jsonFilesPath.interfaces"));
         for (Map.Entry<String, JsonNode> entry : interfacesSwaggerMap.entrySet()){
             //请求参数格式转换，从swagger转换成可以直接请求的参数
             try {
+                //注：目前仅支持生成可以访问的随机数据，需要在后续开发加入填充有效数据的解析方法
+                //ParamParser.interfaceParamParser()可以做继续开发，目标生成多个有效参数--2020.7.2
                 params=ParamParser.interfaceParamParser(entry.getValue());
                 String method="";
                 JsonNode content=entry.getValue();
@@ -73,6 +71,7 @@ public class WriteDataToDB {
         apiData.setUrl(url.replace("-","/"));
         apiData.setMethod(method);
         apiData.setStatusCode(404);
+        apiData.setRun(false);
         apiData.setCreateTime(new Timestamp(new Date().getTime()));
         if (!params.isNull()||!params.isEmpty())
             apiData.setParameters(params.toString());

@@ -11,13 +11,29 @@ import java.util.*;
 public class FileUtil {
     private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
+    //create work dir
+    static {
+        File jsonDir= new File(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath"));
+        if(!jsonDir.exists()&& !jsonDir.isDirectory()){
+            jsonDir.mkdir();
+        }
+        File paramsDir= new File(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath.interfaces"));
+        if(!paramsDir.exists()&& !paramsDir.isDirectory()){
+            paramsDir.mkdir();
+        }
+        File interfacesDir= new File(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath.models"));
+        if(!interfacesDir.exists()&& !interfacesDir.isDirectory()){
+            interfacesDir.mkdir();
+        }
+    }
+
     public static void writeJsonToFile(String JsonStr,String FileName) {
         try{
-            FileWriter fw = new FileWriter(new File(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath")+FileName+".json"));
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(JsonStr);
-            bw.flush();
-            bw.close();}
+            FileOutputStream fos=new FileOutputStream(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath")+FileName+".json");
+            OutputStreamWriter  fw = new OutputStreamWriter(fos, "UTF-8");
+            fw.write(JsonStr);
+            fw.flush();
+            fw.close();}
         catch (IOException e){
             logger.info("Exception occurred in writeJsonToFile.", e);
         }
@@ -54,17 +70,18 @@ public class FileUtil {
         File file = new File(path);
         File[] tempList = file.listFiles();
         try {
-            for (int i = 0; i < tempList.length; i++) {
-                if (tempList[i].isFile()) {
-                    jsonNodeMap.put(tempList[i].getName().replace(".json",""),objectMapper.readTree(tempList[i]));
+            for (File tempFile:tempList) {
+                if (tempFile.isFile()) {
+                    String fileName=tempFile.getName().replace(".json","");
+                    jsonNodeMap.put(fileName,objectMapper.readTree(tempFile));
                 }
-                if (tempList[i].isDirectory()) {
+                if (tempFile.isDirectory()) {
                     //这里就不递归了，
                 }
             }
             return jsonNodeMap;
         } catch (IOException e){
-            logger.info("Exception occurred in getFiles.", e);
+            logger.info("Exception occurred in getFiles."+e.getClass());
         }
         return jsonNodeMap;
     }

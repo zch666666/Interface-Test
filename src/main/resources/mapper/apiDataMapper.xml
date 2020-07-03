@@ -6,11 +6,23 @@
 
     <insert id="ins" parameterType="com.interfacetest.entity.ApiData">
         insert into interface_cases values (default,#{url},#{method},#{parameters},#{statusCode},
-        #{summary},#{produces},#{operationId},#{consumes},#{tags},#{createTime})
+        #{summary},#{produces},#{operationId},#{consumes},#{tags},#{createTime},default)
     </insert>
 
     <select id="selectAll" resultType="com.interfacetest.entity.ApiData">
         select * from interface_cases
     </select>
+
+    <select id="selectNotRun" resultType="com.interfacetest.entity.ApiData">
+        select * from interface_cases where isRun=false
+    </select>
+
+    <update id="updateRunStatues" parameterType="com.interfacetest.entity.ApiData">
+        update interface_cases set isRun=true where id=#{id}
+    </update>
+
+    <update id="updateStatuesCode" parameterType="com.interfacetest.entity.ApiData">
+        update interface_cases set statusCode=#{statusCode} where id=#{id}
+    </update>
 
 </mapper>

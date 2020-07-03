@@ -12,6 +12,7 @@
     <properties>
         <java.version>1.8</java.version>
         <httpclient-cache.version>4.5.12</httpclient-cache.version>
+<!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
     </properties>
 
     <dependencies>
@@ -21,11 +22,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.12</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>
@@ -91,15 +87,14 @@
         <dependency>
             <groupId>com.relevantcodes</groupId>
             <artifactId>extentreports</artifactId>
-            <version>2.41.0</version>
+            <version>2.41.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.aventstack/extentreports -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
-            <version>3.0.0</version>
-            <scope>compile</scope>
+            <version>3.1.5</version>
         </dependency>
 
         <dependency>
@@ -164,21 +159,57 @@
                 </configuration>
             </plugin>
 
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <mainClass>com.interfacetest.ApiTestApplication</mainClass>-->
+<!--                            <addClasspath>true</addClasspath>-->
+<!--                            <classpathPrefix>lib/</classpathPrefix>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+<!--                    <classesDirectory>-->
+<!--                    </classesDirectory>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.interfacetest.ApiTestApplication</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-
-                    </archive>
-                    <classesDirectory>
-                    </classesDirectory>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <suiteXmlFiles>
+                        <!--代表的是要执行的测试套件名称-->
+                        <suiteXmlFile>src/main/resources/testNG.xml</suiteXmlFile>
+                    </suiteXmlFiles>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                     <execution>
+                         <goals>
+                             <goal>java</goal>
+                         </goals>
+                         <phase>compile</phase>
+                     </execution>
+                 </executions>
+                 <configuration>
+                     <classpathScope>compile</classpathScope>
+                     <mainClass>com.interfacetest.ApiTestApplication</mainClass>
+                     <arguments>
+                         <argument>-encoding</argument>
+                         <argument>utf-8</argument>
+                     </arguments>
+                     <classpathScope>compile</classpathScope>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                 </configuration>
             </plugin>
         </plugins>
         </pluginManagement>

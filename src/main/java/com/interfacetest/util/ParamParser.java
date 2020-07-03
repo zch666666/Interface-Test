@@ -22,35 +22,6 @@ public class ParamParser {
         paramJsonMap=paramMapParser();
     }
 
-    /*
-    "parameters": [
-    {
-        "schema": {
-        "$ref": "#/definitions/User"
-    },
-        "in": "body",
-            "name": "user",
-            "description": "user",
-            "required": true
-    }
-		],
-
-
-	{
-  "userId": "string",
-  "userInfo": {
-    "sex": 0,
-    "userAge": 0,
-    "userInfoDetail": {
-      "userGrades": [
-        0
-      ]
-    },
-    "userName": "string"
-  }
-}
-    */
-
     //接收swagger接口信息json，解析并返回可以直接发起api请求的json参数
     public static JsonNode interfaceParamParser(JsonNode interfaces) throws IOException {
         //case1: no param is sent in
@@ -115,8 +86,6 @@ public class ParamParser {
         return resultNode;
     }
 
-
-
     //read swagger object map and output param json map.
     private static  Map<String,JsonNode> paramMapParser() {
         Map<String,JsonNode> modelsSwaggerMap=FileUtil.getFilesToMap(System.getProperty("user.dir") +PropertiesUtil.getProperty("jsonFilesPath.models"));
@@ -152,28 +121,6 @@ public class ParamParser {
         return resultMap;
     }
 
-    /**
-     * {
-     *   "type": "object",
-     *   "title": "UserInfoDetail",
-     *   "properties": {
-     *     "userGrades": {
-     *       "type": "array",
-     *       "items": {
-     *         "format": "int32",
-     *         "type": "integer"
-     *       }
-     *     }
-     *   }
-     * }
-     */
-
-    public static void main(String[] args) {
-//        System.out.println( interfaceParamParser(FileUtil.getInterfaceJson("-demo-addUserInfo"))
-//);
-        //System.out.println(paramMapParser().toString());
-    }
-
     private static Map<String,JsonNode> mapWithOutObjParser(Map<String,JsonNode> swaggerModelsWithOutObj)  {
         Map<String,JsonNode> resultMap=new HashMap<>();
 
@@ -183,20 +130,15 @@ public class ParamParser {
             JsonNode modelSWJsonNode=entry.getValue();
             JsonNode properties=modelSWJsonNode.get("properties");
             JsonNode resultNode;
-
             JSONObject propertiesJson=new JSONObject(properties.toString());
             JSONObject resultJson=new JSONObject();
-
-            //System.out.println("tempJSONis:  "+tempJson);
 
             for (Iterator<String> it = propertiesJson.keys(); it.hasNext(); ) {
                 String key = it.next();
                 JSONObject property= propertiesJson.getJSONObject(key);
-                //System.out.println("key is "+key+"   "+"value is : "+temp);
                 String typeValue= property.getString("type");
                 switch (typeValue){
                     case "array":
-                        //System.out.println("woshi array");
                         JSONObject arrayInfo=property.getJSONObject("items");
                         String elementType=arrayInfo.getString("type");
 
@@ -209,7 +151,6 @@ public class ParamParser {
                             array.add(RandomUtil.getRandomInt());
                             resultJson.put(key,array);
                         }
-                        //System.out.println("resultJson is:"+resultJson);
                     break;
 
                     case "string":
@@ -235,12 +176,10 @@ public class ParamParser {
                         throw new IllegalStateException("Unexpected value: " + typeValue);
                 }
 
-
             }
 
             try {
                 resultNode=objectMapper.readTree(resultJson.toString());
-                //System.out.println("resultNode is:"+resultNode);
                 tempMap.put(nodeName,resultNode);
                 resultMap.putAll(tempMap);
             }catch (JsonProcessingException e){
@@ -277,7 +216,8 @@ public class ParamParser {
                 if (mainNode instanceof ObjectNode) {
                     // Overwrite field
                     JsonNode value = updateNode.get(fieldName);
-                    ((ObjectNode) mainNode).put(fieldName, value);
+//                    ((ObjectNode) mainNode).put(fieldName, value);
+                    ((ObjectNode) mainNode).replace(fieldName, value);
                 }
             }
 
