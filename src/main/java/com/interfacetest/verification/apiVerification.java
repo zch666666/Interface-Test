@@ -35,26 +35,32 @@ public class apiVerification {
         //System.out.println(apiData.toString());
         logger.info("------------------test start --------------------");
         String method=apiData.getMethod();
-        JSONObject jsonObject=null;
+        String parameters=apiData.getParameters();
+        String url=apiData.getUrl();
         HttpResponse response;
         int statusCode;
-        if (!apiData.getParameters().isEmpty()){
-            jsonObject=new JSONObject(apiData.getParameters());
-            System.out.println(jsonObject);
-        }
         //Call different request functions according to different request methods
-        if (method.equals("get")){
-             response=HttpUtil.sendGet(apiData.getUrl(),jsonObject);
-             statusCode=response.getStatusLine().getStatusCode();
-             Assert.assertEquals(200,statusCode,apiData.getUrl()+",接口访问失败！");
-             apiData.setStatusCode(statusCode);
+        switch (method){
+            case "get":
+                response=HttpUtil.sendGet(url,parameters);
+                break;
+            case "post":
+                response=HttpUtil.sendPost(url,parameters);
+                break;
+            case "patch":
+                response=HttpUtil.sendPatch(url,parameters);
+                break;
+            case "put":
+                response=HttpUtil.sendPut(url,parameters);
+                break;
+            default:
+                response=HttpUtil.sendGet(url,parameters);
+                   break;
         }
-        else if (method.equals("post")){
-            response=HttpUtil.sendPost(apiData.getUrl(),apiData.getParameters());
-            statusCode=response.getStatusLine().getStatusCode();
-            Assert.assertEquals(200,statusCode,apiData.getUrl()+",接口访问失败！");
-            apiData.setStatusCode(statusCode);
-        }
+
+        statusCode=response.getStatusLine().getStatusCode();
+        Assert.assertEquals(200,statusCode,url+",接口访问失败！");
+        apiData.setStatusCode(statusCode);
 
         sqlSession.update("updateRunStatues",apiData);
         sqlSession.update("updateStatuesCode",apiData);

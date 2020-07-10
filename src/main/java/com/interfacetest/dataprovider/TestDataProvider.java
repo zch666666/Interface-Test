@@ -25,14 +25,14 @@ public class TestDataProvider {
         for (ApiData data : dataList) {
                 dataProvider.add(new Object[] { data });
         }
-        System.out.println(dataList.size());
+        //System.out.println(dataList.size());
         return dataProvider.iterator();
     }
 
     private static List<ApiData> readUnRunDataFromDB(){
-        List<ApiData> datas;
+        List<ApiData> dataList;
         SqlSession sqlSession= DBUtil.getSession();
-        datas=sqlSession.selectList("selectNotRun");
-        return datas;
+        dataList=sqlSession.selectList("selectNotRun");
+        return dataList;
     }
 }

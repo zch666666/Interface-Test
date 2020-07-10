@@ -9,7 +9,7 @@ Before running this platform, you need to configure related services:
 3. Configure the service host to be tested in projectConfig.properties
 
 Q. How to run this platform?
-step 1. mvn exec:java   
+step 1. mvn compile , mvn exec:java   
 (This command is used to execute ApiTestApplication.java, the purpose is to automatically access the Swagger document interface and generate test cases to be stored in the database.)
 step 2. mvn test
 (This command is used to read test cases from the database, and call different test functions according to the Http method in the test cases, and then generate a test report.)

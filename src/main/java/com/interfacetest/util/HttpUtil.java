@@ -1,34 +1,28 @@
 package com.interfacetest.util;
 
-
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 
 public class HttpUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
-    public static HttpResponse sendGet(String url, JSONObject json){
+    public static HttpResponse sendGet(String url, String jsonRequest){
         HttpGet httpGet;
-        if (json.isEmpty()){
+        if (jsonRequest==null||jsonRequest.isEmpty()){
             logger.info("This test without any param");
             httpGet=new HttpGet(url);
         }
         else {
+            JSONObject json=new JSONObject(jsonRequest);
             //convert json into params
             String key;
             String value;
@@ -57,11 +51,62 @@ public class HttpUtil {
         HttpPost post=new HttpPost(url);
         post.addHeader("Content-Type","application/json; charset=utf-8");
         post.addHeader("Accept","application/json");
-        post.setEntity(new StringEntity(jsonRequest, Charset.forName("UTF-8")));
+        if (!jsonRequest.isEmpty())
+        post.setEntity(new StringEntity(jsonRequest, "utf-8"));
 
         HttpResponse response=null;
         try{
             response=getHttpclient().execute(post);
+            statusCode=response.getStatusLine().getStatusCode();
+            if (statusCode!= 200){
+                logger.error("Method failed:"+response.getStatusLine());
+            }
+        }catch (IOException e){
+            logger.error("exception: "+e);
+        }
+        return response;
+    }
+
+    public static HttpResponse sendPatch(String url,String jsonRequest){
+        JSONObject json=new JSONObject(jsonRequest);
+        int statusCode;
+        HttpPatch patch=new HttpPatch(url);
+        patch.setHeader("Content-type", "application/json");
+        patch.setHeader("Charset", "UTF-8");
+        patch.setHeader("Accept", "application/json");
+        patch.setHeader("Accept-Charset", "UTF-8");
+
+        HttpResponse response=null;
+        try{
+            if (!json.isEmpty())
+            {
+                StringEntity entity = new StringEntity(json.toString(),"utf-8");
+                patch.setEntity(entity);
+            }
+            response=getHttpclient().execute(patch);
+            statusCode=response.getStatusLine().getStatusCode();
+            if (statusCode!= 200){
+                logger.error("Method failed:"+response.getStatusLine());
+            }
+        }catch (IOException e){
+            logger.error("exception: "+e);
+        }
+        return response;
+    }
+
+    public static HttpResponse sendPut(String url,String jsonRequest){
+        JSONObject json=new JSONObject(jsonRequest);
+        int statusCode;
+        HttpPut httpPut=new HttpPut(url);
+        httpPut.setHeader("Content-type", "application/json");
+        HttpResponse response=null;
+        try{
+            if (!json.isEmpty())
+            {
+                StringEntity entity = new StringEntity(json.toString(),"utf-8");
+                httpPut.setEntity(entity);
+            }
+            response=getHttpclient().execute(httpPut);
             statusCode=response.getStatusLine().getStatusCode();
             if (statusCode!= 200){
                 logger.error("Method failed:"+response.getStatusLine());

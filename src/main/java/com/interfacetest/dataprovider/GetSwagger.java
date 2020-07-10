@@ -32,9 +32,8 @@ public class GetSwagger {
     }
 
     public static String getSwaggerFromUrl(String host) {
-        JSONObject param=new JSONObject();
         String result=null;
-        HttpEntity entity=HttpUtil.sendGet(host,param).getEntity();
+        HttpEntity entity=HttpUtil.sendGet(host, null).getEntity();
         if (entity!=null){
             try {
                 result= EntityUtils.toString(entity);

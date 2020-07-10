@@ -2,7 +2,6 @@ package com.interfacetest.entity;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.sql.Timestamp;
 
 @Data
