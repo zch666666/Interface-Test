@@ -9,22 +9,22 @@ Before running this platform, you need to configure related services:
 3. Configure the service host to be tested in projectConfig.properties
 
 Q. How to run this platform?
-step 1. mvn compile , mvn exec:java   
+1. mvn compile , mvn exec:java   
 (This command is used to execute ApiTestApplication.java, the purpose is to automatically access the Swagger document interface and generate test cases to be stored in the database.)
-step 2. mvn test
+2. mvn test
 (This command is used to read test cases from the database, and call different test functions according to the Http method in the test cases, and then generate a test report.)
 
 The following are some of the functions currently implemented。
-1 Grab the interface document information from the Swagger interface, and convert it into a json file and save it in the same directory of the project.
-2 Read the saved json file and parse it, then convert it to ApiData and store it in the database.
-3 Use TestNG+ExtentsReport to visualize test report
+1. Grab the interface document information from the Swagger interface, and convert it into a json file and save it in the same directory of the project.
+2. Read the saved json file and parse it, then convert it to ApiData and store it in the database.
+3. Use TestNG+ExtentsReport to visualize test report
 
 Long-term pending development plan
-1 Develop more kinds of Http method test functions.
-2 Support specific and correct interface access parameter generation, 
+1. Develop more kinds of Http method test functions.
+2. Support specific and correct interface access parameter generation, 
 currently only supports random generation of parameters in the specified format.
-3 Complete the parser for nested object parameters, which will take a certain amount of time and effort.
-4 Use Jenkins and Maven commands for fully automated operation and testing of the platform.
+3. Complete the parser for nested object parameters, which will take a certain amount of time and effort.
+4. Use Jenkins and Maven commands for fully automated operation and testing of the platform.
 
 DDL:
 create table if not exists interface_cases
