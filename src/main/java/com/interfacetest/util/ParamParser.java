@@ -112,12 +112,8 @@ public class ParamParser {
 
         //Obj With Obj JsonMap need further develop
 
-        //Map<String,JsonNode> ObjWithObjJsonMap=mapWithOutObjParser(mapWithObj);
-        //resultMap.putAll(ObjWithObjJsonMap);
-
-//        System.out.println("mapWithoutObj: "+swaggerModelsWithOutObj.toString());
-//        System.out.println("mapWithObj: "+swaggerModelsWithObj.toString());
-
+//        Map<String,JsonNode> ObjWithObjJsonMap=mapWithObjParser(swaggerModelsWithObj);
+//        resultMap.putAll(ObjWithObjJsonMap);
         return resultMap;
     }
 
