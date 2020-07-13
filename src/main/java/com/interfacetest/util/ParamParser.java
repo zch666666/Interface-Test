@@ -34,19 +34,18 @@ public class ParamParser {
         JsonNode resultNode=objectMapper.createObjectNode();
         //Extract parameters array
         ArrayNode params = (ArrayNode) interfaces.findValue("parameters");
-
+        JsonNode tempNode=objectMapper.createObjectNode();
         for(JsonNode objectNode:params){
             //param is object
             if(objectNode.get("schema")!=null){
                 //读取$ref并根据他的值找出需要的类的json，并根据相应的类的json文件生成类的各项参数。
                 JsonNode schemaNode=objectNode.get("schema");
-                JsonNode tempNode;
+
                 //example:{"$ref":"#/definitions/User"}
                 String objectPath=schemaNode.get("$ref").toString().replace("\"","");
                 String objectName=objectPath.split("/")[2];
                 //convert swagger interface schema in to json for API test
                 tempNode=paramJsonMap.get(objectName);
-                resultNode=merge(resultNode,tempNode);
             }
 
             //param is not object
@@ -56,9 +55,7 @@ public class ParamParser {
                 if (objectNode.get("type").asText().equals("integer")){
                     JSONObject integerJson=new JSONObject();
                     integerJson.put(objectNode.get("name").textValue(),RandomUtil.getRandomInt());
-                    JsonNode integerNode=objectMapper.readTree(integerJson.toString());
-
-                    resultNode=merge(resultNode,integerNode);
+                    tempNode=objectMapper.readTree(integerJson.toString());
                 }
 
                 //"type":"string"
@@ -68,19 +65,17 @@ public class ParamParser {
                     if (objectNode.path("format").asText().equals("uuid")|objectNode.path("format").asText().equals("UUID")){
                         JSONObject uuidJson=new JSONObject();
                         uuidJson.put(objectNode.get("name").textValue(),RandomUtil.getRandomUUID());
-                        JsonNode uuidNode=objectMapper.readTree(uuidJson.toString());
-
-                        resultNode=merge(resultNode,uuidNode);
+                        tempNode=objectMapper.readTree(uuidJson.toString());
+                        //resultNode=merge(resultNode,tempNode);
                     }else{
                         //no key "format" just normal string
                         JSONObject strJson=new JSONObject();
                         strJson.put(objectNode.get("name").textValue(),RandomUtil.getRandomStr());
-                        JsonNode uuidNode=objectMapper.readTree(strJson.toString());
-                        resultNode=merge(resultNode,uuidNode);
+                        tempNode=objectMapper.readTree(strJson.toString());
                     }
                 }
-
             }
+            resultNode=merge(resultNode,tempNode);
         }
         //return result;
         return resultNode;
@@ -114,6 +109,7 @@ public class ParamParser {
 
 //        Map<String,JsonNode> ObjWithObjJsonMap=mapWithObjParser(swaggerModelsWithObj);
 //        resultMap.putAll(ObjWithObjJsonMap);
+
         return resultMap;
     }
 
