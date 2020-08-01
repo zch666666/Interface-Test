@@ -17,7 +17,7 @@ public class HttpUtil {
 
     public static HttpResponse sendGet(String url, String jsonRequest){
         HttpGet httpGet;
-        if (jsonRequest==null||jsonRequest.isEmpty()){
+        if (jsonRequest==null||jsonRequest.isEmpty()||jsonRequest.equals("{}")){
             logger.info("This test without any param");
             httpGet=new HttpGet(url);
         }

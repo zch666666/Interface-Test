@@ -35,7 +35,10 @@ public class apiVerification {
         //System.out.println(apiData.toString());
         logger.info("------------------test start --------------------");
         String method=apiData.getMethod();
-        String parameters=apiData.getParameters();
+        String parameters="";
+        if (apiData.getParameters()!=null)
+            parameters=apiData.getParameters();
+
         String url=apiData.getUrl();
         HttpResponse response;
         int statusCode;
@@ -59,12 +62,12 @@ public class apiVerification {
         }
 
         statusCode=response.getStatusLine().getStatusCode();
-        Assert.assertEquals(200,statusCode,url+",接口访问失败！");
         apiData.setStatusCode(statusCode);
-
         sqlSession.update("updateRunStatues",apiData);
         sqlSession.update("updateStatuesCode",apiData);
         sqlSession.commit();
+
+        Assert.assertEquals(statusCode,200,url+",接口访问失败！");
     }
 
 }

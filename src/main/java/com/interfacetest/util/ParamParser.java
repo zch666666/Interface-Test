@@ -32,6 +32,10 @@ public class ParamParser {
         //case 2.3 integer has key "type":"integer":
 
         JsonNode resultNode=objectMapper.createObjectNode();
+
+        if (interfaces.findValue("parameters") == null)
+            return resultNode;
+
         //Extract parameters array
         ArrayNode params = (ArrayNode) interfaces.findValue("parameters");
         JsonNode tempNode=objectMapper.createObjectNode();

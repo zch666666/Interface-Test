@@ -40,7 +40,7 @@ public class WriteDataToDB {
      * 读取参数形式:GetSwagger.run()生成的本地json文件
      * 输出:Set<ApiDataBean> apiCases
      */
-    public static void setApiCases()  {
+    private static void setApiCases()  {
         JsonNode params;
         //读取所有interfaces中.json文件转成JsonNode，再转换成ApiData以Bean的形式存入数据库
         //key 为请求uri, value是请求其他参数信息。
@@ -61,7 +61,8 @@ public class WriteDataToDB {
                 ApiData apiData =creatBean(PropertiesUtil.getProperty("host")+entry.getKey(),method,params,content.get(method));
                 apiDataBeans.add(apiData);
             } catch (Exception e) {
-                logger.info(entry.getKey()+":"+e);
+                //logger.info(entry.getKey()+":"+e);
+                e.printStackTrace();
             }
         }
     }
