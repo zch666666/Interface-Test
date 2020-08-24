@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 //读取本地Json文件,转换成测试用例存入数据库。
-public class WriteDataToDB {
+public class WriteTestCaseToDB {
     private static final Logger logger = LoggerFactory.getLogger(GetSwagger.class);
     private static Set<ApiData> apiDataBeans;
 

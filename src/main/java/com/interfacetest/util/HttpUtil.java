@@ -121,4 +121,14 @@ public class HttpUtil {
         return HttpClients.createDefault();
     }
 
+//    public static String getToken() throws JSONException {
+//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//        params.put("appKey", Arrays.asList(JournalismUtil.JOURNALISMTOKENAPPKEY));
+//        params.put("secret", Arrays.asList(JournalismUtil.JOURNALISMTOKENSECRET));
+//        String token = HttpClient.sendPOSTRequest(JournalismUtil.JOURNALISMTOKENURL, params);
+//        JSONObject jsonObj = new JSONObject(token);
+//        String Authorization=  = jsonObj.getString("token");
+//        return Authorization;
+//    }
+
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.sql.Timestamp;
 
 @Data
-public class ApiData {
+public class ApiData implements ApiDataInterface{
     private Integer id;
     private String url; //接口访问url
     private String method;//访问方法

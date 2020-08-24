@@ -28,6 +28,7 @@ public class ExtentTestNGIReporterListener implements IReporter {
         if(suites.size()>1){
             createSuiteNode=true;
         }
+        //递归记录 suite测试记录
         for (ISuite suite : suites) {
             Map<String, ISuiteResult> result = suite.getResults();
             //如果suite里面没有任何用例，直接跳过，不在报告里生成

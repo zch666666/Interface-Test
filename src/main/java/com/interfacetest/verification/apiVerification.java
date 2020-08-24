@@ -7,7 +7,6 @@ import com.interfacetest.util.DBUtil;
 import com.interfacetest.util.HttpUtil;
 import org.apache.http.HttpResponse;
 import org.apache.ibatis.session.SqlSession;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
