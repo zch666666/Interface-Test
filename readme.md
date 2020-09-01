@@ -43,19 +43,3 @@ create table if not exists interface_cases
 	createTime timestamp not null,
 	isRun tinyint(1) default 0 not null
 );
-
-
-#!/bin/bash
-# 写的参数说明
-echo "启动自动化测试....."
-cd /opt/Interface-Test
-echo "The test platform clears old data....."
-mvn clean
-echo "Platform code compiling....."
-mvn compile
-echo "Start generating test cases....."
-mvn exec:java
-echo "Start executing the test case....."
-mvn test
-cp ./target/test-output/index.html 
-
